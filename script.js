@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const markdownOutput = document.getElementById('markdownOutput');
     const excelUploadBtn = document.getElementById('excelUploadBtn');
     const excelFile = document.getElementById('excelFile');
+    const copyBtn = document.getElementById('copyBtn');
     
     // 设置marked选项
     marked.setOptions({
@@ -63,6 +64,42 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         reader.readAsArrayBuffer(file);
+    });
+    
+    // 添加复制功能
+    copyBtn.addEventListener('click', function() {
+        // 使用 Clipboard API 复制内容
+        const htmlContent = markdownOutput.innerHTML;
+        
+        // 创建一个不可见的textarea来存放HTML内容
+        const textarea = document.createElement('textarea');
+        textarea.value = htmlContent;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'absolute';
+        textarea.style.left = '-9999px';
+        
+        // 添加到文档中
+        document.body.appendChild(textarea);
+        
+        // 选择内容
+        textarea.select();
+        
+        try {
+            // 执行复制命令
+            document.execCommand('copy');
+            
+            // 显示提示
+            const tips = document.querySelector('.copy-tips');
+            tips.classList.add('show');
+            setTimeout(() => {
+                tips.classList.remove('show');
+            }, 2000);
+        } catch (err) {
+            console.error('复制失败:', err);
+        }
+        
+        // 移除临时元素
+        document.body.removeChild(textarea);
     });
     
     // 初始渲染（如果有默认内容）
