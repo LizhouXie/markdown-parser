@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Markdown解析器</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./styles.css">
     <!-- 引入marked.js用于Markdown解析 -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <!-- 引入xlsx.js用于Excel解析 -->
@@ -25,11 +25,111 @@
                 <textarea id="markdownInput" placeholder="在此输入Markdown文本..."></textarea>
             </div>
             <div class="preview-container">
-                <div class="preview-header">渲染结果</div>
+                <div class="preview-header">
+                    渲染结果
+                    <button id="copyBtn" class="copy-btn">一键复制</button>
+                </div>
                 <div id="markdownOutput"></div>
             </div>
         </main>
+        <div class="copy-tips">复制成功！</div>
     </div>
-    <script src="script.js"></script>
+    <script src="./script.js"></script>
+    <script>
+        // 添加复制功能
+        copyBtn.addEventListener('click', function() {
+            // 创建富文本HTML内容
+            const htmlContent = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+                      xmlns:w="urn:schemas-microsoft-com:office:word"
+                      xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="utf-8">
+                    <style>
+                        /* 复制基本样式 */
+                        body { font-family: 'Microsoft YaHei', sans-serif; }
+                        h1, h2, h3, h4, h5, h6 { font-weight: bold; }
+                        strong { font-weight: bold; }
+                        em { font-style: italic; }
+                        ul, ol { margin-left: 20px; }
+                        blockquote { border-left: 4px solid #ddd; padding-left: 10px; color: #666; }
+                        code { background-color: #f6f8fa; padding: 2px 4px; border-radius: 3px; }
+                        pre { background-color: #f6f8fa; padding: 10px; border-radius: 4px; }
+                        table { border-collapse: collapse; width: 100%; }
+                        th, td { border: 1px solid #ddd; padding: 8px; }
+                        th { background-color: #f2f2f2; }
+                    </style>
+                </head>
+                <body>
+                    ${markdownOutput.innerHTML}
+                </body>
+                </html>
+            `;
+            
+            try {
+                // 尝试使用现代Clipboard API
+                if (navigator.clipboard && navigator.clipboard.write) {
+                    const blob = new Blob([htmlContent], {type: 'text/html'});
+                    const plainText = markdownOutput.textContent;
+                    const plainBlob = new Blob([plainText], {type: 'text/plain'});
+                    
+                    const clipboardItem = new ClipboardItem({
+                        'text/html': blob,
+                        'text/plain': plainBlob
+                    });
+                    
+                    navigator.clipboard.write([clipboardItem]).then(() => {
+                        // 显示提示
+                        const tips = document.querySelector('.copy-tips');
+                        tips.classList.add('show');
+                        setTimeout(() => {
+                            tips.classList.remove('show');
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('复制失败:', err);
+                        fallbackCopy();
+                    });
+                } else {
+                    // 如果不支持现代API，使用备用方法
+                    fallbackCopy();
+                }
+            } catch (err) {
+                console.error('复制出错:', err);
+                fallbackCopy();
+            }
+            
+            // 备用复制方法
+            function fallbackCopy() {
+                // 创建一个临时的div
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = markdownOutput.innerHTML;
+                document.body.appendChild(tempDiv);
+                
+                // 创建一个范围
+                const range = document.createRange();
+                range.selectNode(tempDiv);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                
+                try {
+                    // 执行复制命令
+                    document.execCommand('copy');
+                    
+                    // 显示提示
+                    const tips = document.querySelector('.copy-tips');
+                    tips.classList.add('show');
+                    setTimeout(() => {
+                        tips.classList.remove('show');
+                    }, 2000);
+                } catch (err) {
+                    console.error('备用复制失败:', err);
+                }
+                
+                // 清理
+                window.getSelection().removeAllRanges();
+                document.body.removeChild(tempDiv);
+            }
+        });
+    </script>
 </body>
 </html> 
