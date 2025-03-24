@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown解析器</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 引入marked.js用于Markdown解析 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- 引入xlsx.js用于Excel解析 -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Markdown解析器</h1>
+            <div class="upload-container">
+                <button id="excelUploadBtn">上传Excel文件</button>
+                <input type="file" id="excelFile" accept=".xlsx,.xls" style="display:none">
+            </div>
+        </header>
+        <main>
+            <div class="editor-container">
+                <div class="editor-header">Markdown原文</div>
+                <textarea id="markdownInput" placeholder="在此输入Markdown文本..."></textarea>
+            </div>
+            <div class="preview-container">
+                <div class="preview-header">渲染结果</div>
+                <div id="markdownOutput"></div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
